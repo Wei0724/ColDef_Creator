@@ -18,7 +18,8 @@
       <HintPath>Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="SmileWei.EmbeddedApp">
-      <HintPath>..\SmileWei.EmbeddedApp20150201\SmileWei.EmbeddedApp.WinForm\bin\Debug\SmileWei.EmbeddedApp.dll</HintPath>
+      <HintPath>..\Users\Wei_Pan\Downloads\SmileWei.EmbeddedApp20150201\SmileWei.EmbeddedApp.WinForm\bin\Debug\SmileWei.EmbeddedApp.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
 

@@ -31,8 +31,13 @@ namespace WinForms
 
         List<innerObj> list_LovObj = new List<innerObj>();
 
-        public string filePath = "";
+        public int count = 0;
 
+        private string filePath = "";
+
+        private int tempColumnIndex = 0;
+
+        private int tempRowIndex = 0;
 
 
         public class innerObj
@@ -89,7 +94,7 @@ namespace WinForms
 
         private ContextMenuStrip contextMenu;//宣告一個右鍵選單的物件
 
-        private ToolStripMenuItem toolstrip = new ToolStripMenuItem();//宣告一個選單item物件
+
 
 
 
@@ -97,8 +102,158 @@ namespace WinForms
         {
             InitializeComponent();
             InitialListView();
-            toolstrip.Click += new EventHandler(toolstrip_Click);
+            //InitailComboBoxColumn();
+            InitialContextMenu();
+
+            //版本號
+            string version = System.Windows.Forms.Application.ProductVersion;
+            this.Text = String.Format("ColDef Creator {0}", version);
+
         }
+
+
+        private void InitialListView()
+        {
+            //lstVwHeaders.View = View.Details;
+            //lstVwHeaders.GridLines = true;
+            //lstVwHeaders.LabelEdit = true;
+            //lstVwHeaders.FullRowSelect = true;
+            //lstVwHeaders.Columns.Add("編號", 100);
+            //lstVwHeaders.Columns.Add("Grid/Form", 100);
+
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    var item = new ListViewItem($"No.{i}");
+            //    item.SubItems.Add($"文字{i}");
+            //    lstVwHeaders.Items.Add(item);
+            //}
+
+            // Set the view to show details.
+            lstVwSubItems.View = View.Details;
+            // Allow the user to edit item text.
+            //lstVwSubItems.LabelEdit = true;
+            // Allow the user to rearrange columns.
+            lstVwSubItems.AllowColumnReorder = true;
+            // Display check boxes.
+            lstVwSubItems.CheckBoxes = true;
+            // Select the item and subitems when selection is made.
+            lstVwSubItems.FullRowSelect = true;
+            // Display grid lines.
+            lstVwSubItems.GridLines = true;
+            // Sort the items in the list in ascending order.
+            lstVwSubItems.Sorting = SortOrder.Ascending;
+
+            // Create three items and three sets of subitems for each item.
+            //ListViewItem item1 = new ListViewItem("item1", 0);
+            //// Place a check mark next to the item.
+            //item1.Checked = true;
+            //item1.SubItems.Add("1");
+            //item1.SubItems.Add("2");
+            //item1.SubItems.Add("3");
+            //ListViewItem item2 = new ListViewItem("item2", 1);
+            //item2.SubItems.Add("4");
+            //item2.SubItems.Add("5");
+            //item2.SubItems.Add("6");
+            //ListViewItem item3 = new ListViewItem("item3", 0);
+            //// Place a check mark next to the item.
+            //item3.Checked = true;
+            //item3.SubItems.Add("7");
+            //item3.SubItems.Add("8");
+            //item3.SubItems.Add("9");
+
+            // Create columns for the items and subitems.
+            // Width of -2 indicates auto-size.
+            //lstVwSubItems.Columns.Add("Item Column", -2, HorizontalAlignment.Left);
+            //lstVwSubItems.Columns.Add("Column 2", -2, HorizontalAlignment.Left);
+            //lstVwSubItems.Columns.Add("Column 3", -2, HorizontalAlignment.Left);
+            //lstVwSubItems.Columns.Add("Column 4", -2, HorizontalAlignment.Center);
+
+            //Add the items to the ListView.
+            //lstVwSubItems.Items.AddRange(new ListViewItem[] { item1, item2, item3 });
+
+            // Create two ImageList objects.
+            ImageList imageListSmall = new ImageList();
+            ImageList imageListLarge = new ImageList();
+
+            // Initialize the ImageList objects with bitmaps.
+            //imageListSmall.Images.Add(Bitmap.FromFile("d:\\Users\\Wei_Pan\\Desktop\\ERP1.jpg"));
+            //imageListSmall.Images.Add(Bitmap.FromFile("d:\\Users\\Wei_Pan\\Pictures\\狗幣.png"));
+            //imageListLarge.Images.Add(Bitmap.FromFile("d:\\Users\\Wei_Pan\\Pictures\\柴01.jpg"));
+            //imageListLarge.Images.Add(Bitmap.FromFile("d:\\Users\\Wei_Pan\\Pictures\\柴03.jpg"));
+
+
+            imageListSmall.Images.Add(Bitmap.FromFile("ERP1.jpg"));
+            imageListSmall.Images.Add(Bitmap.FromFile("狗幣.png"));
+            imageListLarge.Images.Add(Bitmap.FromFile("柴01.jpg"));
+            imageListLarge.Images.Add(Bitmap.FromFile("柴03.jpg"));
+
+            //Assign the ImageList objects to the ListView.
+            lstVwSubItems.LargeImageList = imageListLarge;
+            lstVwSubItems.SmallImageList = imageListSmall;
+        }
+
+        //設定右鍵選單
+        private void InitialContextMenu()
+        {
+            // 加載圖像
+            Image image1 = Image.FromFile(@"delete.png");
+            Image image2 = Image.FromFile(@"form.png");
+            Image image3 = Image.FromFile(@"grid.png");
+
+
+            //if (contextMenu == null)
+            //{
+            contextMenu = new ContextMenuStrip();
+            // 創建菜單項目
+            ToolStripMenuItem item1 = new ToolStripMenuItem("清空", image1);
+            ToolStripMenuItem item2 = new ToolStripMenuItem("設定Form", image2);
+            ToolStripMenuItem item3 = new ToolStripMenuItem("設定Grid", image3);
+
+            // 將菜單項目添加到ContextMenuStrip
+            //contextMenu.Items.Add(item1);
+            //contextMenu.Items.Add(item2);
+            //contextMenu.Items.Add(item3);
+            contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { item1, item2, item3 });
+
+            //}
+
+            // 關聯ContextMenuStrip到您的控制元件
+            this.dGdVwHeaders.Columns[1].ContextMenuStrip = contextMenu;
+
+            //item1.Click += new EventHandler(toolstrip_Click);
+
+            // 設置事件處理程序以處理選項的點擊事件
+            item1.Click += Item1_Click;
+            item2.Click += Item2_Click;
+            item3.Click += Item3_Click;
+        }
+
+        //設定DataGridView下拉式選單item
+        private void InitailComboBoxColumn()
+        {
+            // 創建一個DataGridViewComboBoxColumn
+            DataGridViewComboBoxColumn comboBoxColumn = new DataGridViewComboBoxColumn();
+
+            // 設定列的名稱
+            comboBoxColumn.Name = "Type";
+            comboBoxColumn.HeaderText = "Model類型";
+
+            // 設定下拉式選單的選項
+            comboBoxColumn.Items.Add("");
+            comboBoxColumn.Items.Add("Form");
+            comboBoxColumn.Items.Add("Grid");
+
+            // 设置单元格的默认样式
+            DataGridViewCellStyle cellStyle = new DataGridViewCellStyle();
+            cellStyle.ForeColor = System.Drawing.Color.Blue;
+            cellStyle.BackColor = System.Drawing.Color.Yellow;
+            comboBoxColumn.DefaultCellStyle = cellStyle;
+
+            // 將列添加到DataGridView中
+            dGdVwHeaders.Columns.Add(comboBoxColumn);
+        }
+
+
 
 
         private void btnPath_Click(object sender, EventArgs e)
@@ -139,7 +294,8 @@ namespace WinForms
                     // 判斷編碼
                     if (!IsBig5Encoding(openFileDialog.FileName))
                     {
-                        MessageBox.Show("非BIG5編碼");
+                        //MessageBox.Show("非BIG5編碼");
+                        textBoxResults.AppendText($"非BIG5編碼{Environment.NewLine}");
                         // 讀取文字檔的每一行
                         lines = File.ReadAllLines(selectedFilePath);
                     }
@@ -547,9 +703,6 @@ namespace WinForms
                     });
 
 
-                    //设置列的右键菜单
-                    //this.dGdVwHeaders.Columns[1].ContextMenuStrip = ;
-
                     var datarow = this.dGdVwHeaders.Rows[0];
                     this.Fun_Reload_SubDataGridView(datarow);
 
@@ -630,6 +783,7 @@ namespace WinForms
         }
 
 
+
         //偵測byte[]是否為BIG5編碼
         public static bool IsBig5Encoding(byte[] bytes)
         {
@@ -668,88 +822,8 @@ namespace WinForms
         }
 
 
-        private void InitialListView()
-        {
-            //lstVwHeaders.View = View.Details;
-            //lstVwHeaders.GridLines = true;
-            //lstVwHeaders.LabelEdit = true;
-            //lstVwHeaders.FullRowSelect = true;
-            //lstVwHeaders.Columns.Add("編號", 100);
-            //lstVwHeaders.Columns.Add("Grid/Form", 100);
 
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    var item = new ListViewItem($"No.{i}");
-            //    item.SubItems.Add($"文字{i}");
-            //    lstVwHeaders.Items.Add(item);
-            //}
-
-            // Set the view to show details.
-            lstVwSubItems.View = View.Details;
-            // Allow the user to edit item text.
-            //lstVwSubItems.LabelEdit = true;
-            // Allow the user to rearrange columns.
-            lstVwSubItems.AllowColumnReorder = true;
-            // Display check boxes.
-            lstVwSubItems.CheckBoxes = true;
-            // Select the item and subitems when selection is made.
-            lstVwSubItems.FullRowSelect = true;
-            // Display grid lines.
-            lstVwSubItems.GridLines = true;
-            // Sort the items in the list in ascending order.
-            lstVwSubItems.Sorting = SortOrder.Ascending;
-
-            // Create three items and three sets of subitems for each item.
-            //ListViewItem item1 = new ListViewItem("item1", 0);
-            //// Place a check mark next to the item.
-            //item1.Checked = true;
-            //item1.SubItems.Add("1");
-            //item1.SubItems.Add("2");
-            //item1.SubItems.Add("3");
-            //ListViewItem item2 = new ListViewItem("item2", 1);
-            //item2.SubItems.Add("4");
-            //item2.SubItems.Add("5");
-            //item2.SubItems.Add("6");
-            //ListViewItem item3 = new ListViewItem("item3", 0);
-            //// Place a check mark next to the item.
-            //item3.Checked = true;
-            //item3.SubItems.Add("7");
-            //item3.SubItems.Add("8");
-            //item3.SubItems.Add("9");
-
-            // Create columns for the items and subitems.
-            // Width of -2 indicates auto-size.
-            //lstVwSubItems.Columns.Add("Item Column", -2, HorizontalAlignment.Left);
-            //lstVwSubItems.Columns.Add("Column 2", -2, HorizontalAlignment.Left);
-            //lstVwSubItems.Columns.Add("Column 3", -2, HorizontalAlignment.Left);
-            //lstVwSubItems.Columns.Add("Column 4", -2, HorizontalAlignment.Center);
-
-            //Add the items to the ListView.
-            //lstVwSubItems.Items.AddRange(new ListViewItem[] { item1, item2, item3 });
-
-            // Create two ImageList objects.
-            ImageList imageListSmall = new ImageList();
-            ImageList imageListLarge = new ImageList();
-
-            // Initialize the ImageList objects with bitmaps.
-            //imageListSmall.Images.Add(Bitmap.FromFile("d:\\Users\\Wei_Pan\\Desktop\\ERP1.jpg"));
-            //imageListSmall.Images.Add(Bitmap.FromFile("d:\\Users\\Wei_Pan\\Pictures\\狗幣.png"));
-            //imageListLarge.Images.Add(Bitmap.FromFile("d:\\Users\\Wei_Pan\\Pictures\\柴01.jpg"));
-            //imageListLarge.Images.Add(Bitmap.FromFile("d:\\Users\\Wei_Pan\\Pictures\\柴03.jpg"));
-
-
-            imageListSmall.Images.Add(Bitmap.FromFile("ERP1.jpg"));
-            imageListSmall.Images.Add(Bitmap.FromFile("狗幣.png"));
-            imageListLarge.Images.Add(Bitmap.FromFile("柴01.jpg"));
-            imageListLarge.Images.Add(Bitmap.FromFile("柴03.jpg"));
-
-            //Assign the ImageList objects to the ListView.
-            lstVwSubItems.LargeImageList = imageListLarge;
-            lstVwSubItems.SmallImageList = imageListSmall;
-        }
-
-
-        //選GRID/FORM
+        //點擊DataGridView(GRID/FORM)
         private void dGdVwHeaders_SelectionChanged(object sender, EventArgs e)
         {
             var rowsCount = dGdVwHeaders.SelectedRows.Count;
@@ -763,8 +837,6 @@ namespace WinForms
             //lstVwSubItems.Items.AddRange(new ListViewItem[] { item1, item2, item3 });
 
         }
-
-        public int count = 0;
 
         //選細項順序  重新載入也會觸發
         private void lstVwSubItems_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -887,6 +959,7 @@ namespace WinForms
         private void btn_run_Click(object sender, EventArgs e)
         {
             textBoxResults.Clear();
+            List<string> allResultStr = new List<string>();
             foreach (DataGridViewRow row in this.dGdVwHeaders.Rows)
             {
                 // 檢查行的類型，以排除 Header 和其他非資料行
@@ -924,8 +997,8 @@ namespace WinForms
 
 
                 /*LOV部分*/
-                string _templateModel_grid_Lovl = "      {{\r\n        headerName: '{0}',\r\n        headerValueGetter: this._agService.headerValueGetter,\r\n        field: '{1}',\r\n        suppressSizeToFit: true,\r\n        editable: true, //(params) => {{ return params.data.ITEM === 0; // 可新增不可修改 }},\r\n        sortable: true,\r\n        width: 120,\r\n        type: 'text',\r\n        cellEditor: 'lovEditor',\r\n        cellEditorParams: (params) => {{\r\n          return <ILovEditorParams>{{\r\n            apiParams: {{\r\n              // sp前綴\r\n              moduleNo: [模組名稱],\r\n              programNo: '{2}',\r\n              commonApiType: ECommonApiType.CallStoreProcedureDataSet,\r\n            }},\r\n            queryAction: [sp名稱], // sp名稱\r\n            //payload: {{}}, // input\r\n            refCursorKeys: ['v表名稱Info', 'v表名稱Count'], // output\r\n            colDefs: [\r\n{3}            ],\r\n            keyMapping: {{              {4}\r\n            }},\r\n            checkInput: true,\r\n            onPostChange: (params) => {{\r\n              if (params.isValidInput) //this._Service.ServiceFun(params.value);\r\n            }},\r\n            // onDbClick: (params) => {{\r\n            //   params.nativeEvent.stopPropagation();\r\n            // }},\r\n          }};\r\n        }},\r\n      }},\r\n";
-                string _templateModel_form_Lovl = "      new FormLov({{\r\n        key: '{0}',\r\n        label: '{1}',\r\n        //labelWidth: '10',\r\n        apiParams: {{\r\n          moduleNo: [模組名稱],\r\n          programNo: '{2}',\r\n          commonApiType: ECommonApiType.CallStoreProcedureDataSet,\r\n        }},\r\n        queryAction: [SP名稱], // sp名稱\r\n        refCursorKeys: ['v表名稱Info', 'v表名稱Count'],\r\n        colDefs: [\r\n{3}        ],\r\n        keyMapping: {{{4}\r\n        }},\r\n        checkInput: true,\r\n        flex: '25',\r\n        class: 'pr-1',\r\n      }}),\r\n";
+                string _templateModel_grid_Lovl = "      {{\r\n        headerName: '{0}',\r\n        headerValueGetter: this._agService.headerValueGetter,\r\n        field: '{1}',\r\n        suppressSizeToFit: true,\r\n        editable: true, //(params) => {{ return params.data.ITEM === 0; // 可新增不可修改 }},\r\n        sortable: true,\r\n        width: 120,\r\n        type: 'text',\r\n        cellEditor: 'lovEditor',\r\n        cellEditorParams: (params) => {{\r\n          return <ILovEditorParams>{{\r\n            apiParams: {{\r\n              // sp前綴\r\n              moduleNo: '模組名稱',\r\n              programNo: '{2}',\r\n              commonApiType: ECommonApiType.CallStoreProcedureDataSet,\r\n            }},\r\n            queryAction: 'sp名稱', // sp名稱\r\n            //payload: {{}}, // input\r\n            refCursorKeys: ['v表名稱Info', 'v表名稱Count'], // output\r\n            colDefs: [\r\n{3}            ],\r\n            keyMapping: {{              {4}\r\n            }},\r\n            checkInput: true,\r\n            onPostChange: (params) => {{\r\n              if (params.isValidInput) //this._Service.ServiceFun(params.value);\r\n            }},\r\n          }};\r\n        }},\r\n      }},\r\n";
+                string _templateModel_form_Lovl = "      new FormLov({{\r\n        key: '{0}',\r\n        label: '{1}',\r\n        //labelWidth: '10',\r\n        apiParams: {{\r\n          moduleNo: '模組名稱',\r\n          programNo: '{2}',\r\n          commonApiType: ECommonApiType.CallStoreProcedureDataSet,\r\n        }},\r\n        queryAction: 'SP名稱', // sp名稱\r\n        refCursorKeys: ['v表名稱Info', 'v表名稱Count'],\r\n        colDefs: [\r\n{3}        ],\r\n        keyMapping: {{{4}\r\n        }},\r\n        checkInput: true,\r\n        flex: '25',\r\n        class: 'pr-1',\r\n      }}),\r\n";
 
                 /*其他*/
                 string _templateModel_grid_select = "      {{\r\n        headerName: '{0}',\r\n        headerValueGetter: this._agService.headerValueGetter,\r\n        field: '{1}',\r\n        type: 'text',\r\n        editable: true, //(params) => {{return params.data?.ITEM === 0;}},// 可新增不可修改\r\n        sortable: true,\r\n        width: 100,\r\n        suppressSizeToFit: true,\r\n        valueFormatter: (params) => {{\r\n          const displayValue = params.node?.data?.{1} ?? '';\r\n          return {{ \r\n            // '1': 'Cosmos/KM3代工', '3': '組底加工' \r\n          }}[displayValue] ?? '';\r\n        }},\r\n        // valueSetter: (params) => {{\r\n        //   const optKey = params.newValue?.[0];\r\n        //   params.data.{1} = optKey;\r\n        //   return true;\r\n        // }},\r\n        cellEditor: 'selectRenderer',\r\n        cellEditorParams: {{\r\n          control: {{\r\n            multiple: false,\r\n            field: ['{1}'],\r\n            options: of([\r\n              // {{ key: '1', value: 'Cosmos/KM3代工' }},\r\n              // {{ key: '3', value: '組底加工' }},\r\n            ]),\r\n          }},\r\n        }},\r\n        floatingFilterComponent: 'selectFilterRenderer',\r\n        floatingFilterComponentParams: {{\r\n          options: of([\r\n            // {{ key: '1', value: 'Cosmos/KM3代工' }},\r\n            // {{ key: '3', value: '組底加工' }},\r\n          ]),\r\n        }},\r\n      }},\r\n";
@@ -938,7 +1011,7 @@ namespace WinForms
                     resultStr += _templateModel_grid_header_start;
                 else if (_dataType == "Form")
                     resultStr += _templateModel_form_header_start;
-                else if (_dataType == null) { }
+                else if (_dataType == null || _dataType == "") { }
                 else
                     MessageBox.Show("Grid/Form 欄位填寫有誤");
 
@@ -1000,10 +1073,15 @@ namespace WinForms
                 else if (_dataType == null) { };
 
                 textBoxResults.AppendText(resultStr);
-
+                allResultStr.Add(resultStr);
 
                 //-----------------------------------------------------------------------------
             }
+
+            FileWrite(allResultStr, false, "");
+            //開啟copy.txt
+            System.Diagnostics.Process.Start("explorer.exe", "temp.txt");
+
         }
 
         /// <summary>
@@ -1040,7 +1118,7 @@ namespace WinForms
             foreach (var resultstr2 in testlist2)
             {
                 // Create three items and three sets of subitems for each item.
-                ListViewItem item1 = new ListViewItem(resultstr2.index.ToString().Trim(), 1);
+                ListViewItem item1 = new ListViewItem("區段" + resultstr2.index.ToString().Trim(), 1);
                 // Place a check mark next to the item.
                 item1.Checked = resultstr2.Checked;
                 //if(resultstr2.SubSeq != null) { MessageBox.Show(resultstr2.SubSeq.ToString(),"input"); }
@@ -1051,8 +1129,8 @@ namespace WinForms
                 item1.SubItems.Add(resultstr2.itemEngName);
                 item1.SubItems.Add(resultstr2.itemType);
                 item1.SubItems.Add(resultstr2.innerIndex.ToString());
-                item1.SubItems[1].Text = resultstr2.SubSeq.ToString();
-                item1.SubItems[1].Text = resultstr2.SubSeq.ToString();
+                //item1.SubItems[1].Text =  resultstr2.SubSeq.ToString();
+                //item1.SubItems[1].Text = resultstr2.SubSeq.ToString();
 
                 //Add the items to the ListView.
                 lstVwSubItems.Items.AddRange(new ListViewItem[] { item1 });
@@ -1089,72 +1167,102 @@ namespace WinForms
             return index is 0 ? del_strng : map_string;
         }
 
-        private void dGdVwHeaders_CellContextMenuStripNeeded(object sender, DataGridViewCellContextMenuStripNeededEventArgs e)
+        //private void dGdVwHeaders_CellContextMenuStripNeeded(object sender, DataGridViewCellContextMenuStripNeededEventArgs e)
+        //{
+        //    //CellContextMenuStripNeeded　事件处理方法的参数中、「e.ColumnIndex=-1」表示行头、「e.RowIndex=-1」表示列头。
+
+        //    DataGridView dgv = (DataGridView)sender;
+
+        //    if (contextMenu == null)
+        //    {
+        //        //contextMenu = new ContextMenuStrip();
+        //        //toolstrip.Text = "刪除";
+        //        //toolstrip.Text = "設定FORM";
+        //        //toolstrip.Text = "設定GRID";
+        //        //contextMenu.Items.Add(toolstrip);
+        //    }
+
+        //    if (dgv[e.ColumnIndex, e.RowIndex].Value is int)
+        //    {
+        //        //　如果单元格值是整数时
+        //        e.ContextMenuStrip = contextMenu;
+        //    }
+
+
+        //}
+
+
+        //private void toolstrip_Click(object sender, EventArgs e)
+        //{
+        //    if (MessageBox.Show("確定要刪除該筆資料？", "警告!!", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+        //    {
+        //        //如果按下yes就會執行刪除指令,這邊就看個人發揮囉!!
+        //    }
+        //}
+
+        //右鍵事件
+        private void Item1_Click(object sender, EventArgs e)
         {
-            //CellContextMenuStripNeeded　事件处理方法的参数中、「e.ColumnIndex=-1」表示行头、「e.RowIndex=-1」表示列头。
-
-            DataGridView dgv = (DataGridView)sender;
-
-            if (contextMenu == null)
-            {
-                contextMenu = new ContextMenuStrip();
-                toolstrip.Text = "刪除";
-                toolstrip.Text = "設定FORM";
-                toolstrip.Text = "設定GRID";
-                contextMenu.Items.Add(toolstrip);
-            }
-
-            if (dgv[e.ColumnIndex, e.RowIndex].Value is int)
-            {
-                //　如果单元格值是整数时
-                e.ContextMenuStrip = contextMenu;
-            }
-
+            // 設定新的值
+            dGdVwHeaders.Rows[tempRowIndex].Cells[tempColumnIndex].Value = "";
 
         }
-
-
-
-        private void toolstrip_Click(object sender, EventArgs e)
+        //右鍵事件
+        private void Item2_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("確定要刪除該筆資料？", "警告!!", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-            {
-                //如果按下yes就會執行刪除指令,這邊就看個人發揮囉!!
-            }
+            // 設定新的值
+            dGdVwHeaders.Rows[tempRowIndex].Cells[tempColumnIndex].Value = "Form";
+        }
+        //右鍵事件
+        private void Item3_Click(object sender, EventArgs e)
+        {
+            // 設定新的值
+            dGdVwHeaders.Rows[tempRowIndex].Cells[tempColumnIndex].Value = "Grid";
         }
 
+        //取得右鍵cell資訊
         private void dGdVwHeaders_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            DataGridView dgv = (DataGridView)sender;
-            if (e.Button == MouseButtons.Right) 
-            { 
-                if (e.RowIndex >= 0)
+            tempColumnIndex = e.ColumnIndex;
+            tempRowIndex = e.RowIndex;
+
+            if (e.RowIndex >= 0)
+            {
+                if (!dGdVwHeaders.Rows[tempRowIndex].Selected)
                 {
-                    if (contextMenu == null)
-                    {
-                        contextMenu = new ContextMenuStrip();
-                        toolstrip.Text = "刪除";
-                        contextMenu.Items.Add(toolstrip);
-                        toolstrip.Text = "設定FORM";
-                        contextMenu.Items.Add(toolstrip);
-                        toolstrip.Text = "設定GRID";
-                        contextMenu.Items.Add(toolstrip);
-
-   //                     contextMenu.Items.AddRange(new
-   //System.Windows.Forms.ToolStripItem[] {
-   //   , "設定FORM"});
-
-                    }
-
-                    this.dGdVwHeaders.Columns[1].ContextMenuStrip = contextMenu;
-
-                    if (dgv[e.ColumnIndex, e.RowIndex].Value is int)
-                    {
-                        //　如果单元格值是整数时
-                        contextMenu.Show(MousePosition.X,MousePosition.Y);
-                    }
+                    dGdVwHeaders.ClearSelection();
+                    dGdVwHeaders.Rows[tempRowIndex].Selected = true;
                 }
             }
+
+        }
+
+        public void FileWrite(List<string> Text, Boolean append, string Scope)
+        {
+            TextWriter txt = new StreamWriter(@".\temp.txt", append);
+
+            if (Scope == "Start")
+            {
+                //Clear
+                txt.Write("");
+            }
+            else
+            {
+                if (Text.Count > 0)
+                {
+                    foreach (string t in Text)
+                    {
+                        txt.WriteLine(t);
+                    }
+                }
+                else
+                {
+                    txt.WriteLine("");
+                }
+            }
+
+
+            txt.Close();
         }
     }
 }

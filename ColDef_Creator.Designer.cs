@@ -36,11 +36,11 @@ namespace WinForms
             textBoxResults = new TextBox();
             lstVwSubItems = new ListView();
             dGdVwHeaders = new DataGridView();
-            Index = new DataGridViewTextBoxColumn();
-            Type = new DataGridViewTextBoxColumn();
             btn_clearMessege = new Button();
             btn_run = new Button();
             dGV_innerObj = new DataGridView();
+            Index = new DataGridViewTextBoxColumn();
+            Type = new DataGridViewTextBoxColumn();
             ((System.ComponentModel.ISupportInitialize)dGdVwHeaders).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dGV_innerObj).BeginInit();
             SuspendLayout();
@@ -70,7 +70,7 @@ namespace WinForms
             textBoxResults.Multiline = true;
             textBoxResults.Name = "textBoxResults";
             textBoxResults.ScrollBars = ScrollBars.Both;
-            textBoxResults.Size = new Size(893, 211);
+            textBoxResults.Size = new Size(1119, 219);
             textBoxResults.TabIndex = 0;
             // 
             // lstVwSubItems
@@ -79,7 +79,7 @@ namespace WinForms
             lstVwSubItems.GridLines = true;
             lstVwSubItems.Location = new Point(334, 109);
             lstVwSubItems.Name = "lstVwSubItems";
-            lstVwSubItems.Size = new Size(585, 227);
+            lstVwSubItems.Size = new Size(811, 227);
             lstVwSubItems.TabIndex = 2;
             lstVwSubItems.UseCompatibleStateImageBehavior = false;
             lstVwSubItems.ItemCheck += lstVwSubItems_ItemCheck;
@@ -95,17 +95,7 @@ namespace WinForms
             dGdVwHeaders.Size = new Size(300, 227);
             dGdVwHeaders.TabIndex = 3;
             dGdVwHeaders.CellMouseDown += dGdVwHeaders_CellMouseDown;
-            // 
-            // Index
-            // 
-            Index.HeaderText = "分類索引";
-            Index.Name = "Index";
-            Index.ReadOnly = true;
-            // 
-            // Type
-            // 
-            Type.HeaderText = "Model類型";
-            Type.Name = "Type";
+            dGdVwHeaders.SelectionChanged += dGdVwHeaders_SelectionChanged;
             // 
             // btn_clearMessege
             // 
@@ -132,17 +122,30 @@ namespace WinForms
             dGV_innerObj.AllowUserToAddRows = false;
             dGV_innerObj.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             dGV_innerObj.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dGV_innerObj.Location = new Point(12, 559);
+            dGV_innerObj.Location = new Point(12, 354);
             dGV_innerObj.Name = "dGV_innerObj";
             dGV_innerObj.RowTemplate.Height = 25;
-            dGV_innerObj.Size = new Size(919, 227);
+            dGV_innerObj.Size = new Size(1145, 219);
             dGV_innerObj.TabIndex = 6;
+            dGV_innerObj.Visible = false;
+            // 
+            // Index
+            // 
+            Index.HeaderText = "區段代號";
+            Index.Name = "Index";
+            Index.ReadOnly = true;
+            // 
+            // Type
+            // 
+            Type.HeaderText = "Model類型";
+            Type.Name = "Type";
+            Type.ToolTipText = "111";
             // 
             // ColDef_Creator
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(943, 810);
+            ClientSize = new Size(1169, 597);
             Controls.Add(dGV_innerObj);
             Controls.Add(textBoxResults);
             Controls.Add(btn_run);
