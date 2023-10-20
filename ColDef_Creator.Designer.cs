@@ -39,8 +39,9 @@ namespace WinForms
             btn_clearMessege = new Button();
             btn_run = new Button();
             dGV_innerObj = new DataGridView();
+            comboBox1 = new ComboBox();
             Index = new DataGridViewTextBoxColumn();
-            Type = new DataGridViewTextBoxColumn();
+            Type = new DataGridViewComboBoxColumn();
             ((System.ComponentModel.ISupportInitialize)dGdVwHeaders).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dGV_innerObj).BeginInit();
             SuspendLayout();
@@ -70,7 +71,7 @@ namespace WinForms
             textBoxResults.Multiline = true;
             textBoxResults.Name = "textBoxResults";
             textBoxResults.ScrollBars = ScrollBars.Both;
-            textBoxResults.Size = new Size(1119, 219);
+            textBoxResults.Size = new Size(1119, 243);
             textBoxResults.TabIndex = 0;
             // 
             // lstVwSubItems
@@ -83,6 +84,7 @@ namespace WinForms
             lstVwSubItems.TabIndex = 2;
             lstVwSubItems.UseCompatibleStateImageBehavior = false;
             lstVwSubItems.ItemCheck += lstVwSubItems_ItemCheck;
+            lstVwSubItems.MouseUp += lstVwSubItems_MouseUp;
             // 
             // dGdVwHeaders
             // 
@@ -129,6 +131,16 @@ namespace WinForms
             dGV_innerObj.TabIndex = 6;
             dGV_innerObj.Visible = false;
             // 
+            // comboBox1
+            // 
+            comboBox1.FormattingEnabled = true;
+            comboBox1.Location = new Point(1024, 80);
+            comboBox1.Name = "comboBox1";
+            comboBox1.Size = new Size(121, 23);
+            comboBox1.TabIndex = 7;
+            comboBox1.SelectedValueChanged += comboBox1_SelectedValueChanged;
+            comboBox1.MouseLeave += comboBox1_MouseLeave;
+            // 
             // Index
             // 
             Index.HeaderText = "區段代號";
@@ -137,15 +149,19 @@ namespace WinForms
             // 
             // Type
             // 
-            Type.HeaderText = "Model類型";
+            Type.HeaderText = "選擇類型(Grid/Form)";
+            Type.Items.AddRange(new object[] { "", "Form", "Grid" });
             Type.Name = "Type";
-            Type.ToolTipText = "111";
+            Type.Resizable = DataGridViewTriState.True;
+            Type.SortMode = DataGridViewColumnSortMode.Automatic;
+            Type.ToolTipText = "Type";
             // 
             // ColDef_Creator
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1169, 597);
+            Controls.Add(comboBox1);
             Controls.Add(dGV_innerObj);
             Controls.Add(textBoxResults);
             Controls.Add(btn_run);
@@ -173,7 +189,8 @@ namespace WinForms
         private Button btn_clearMessege;
         private Button btn_run;
         private DataGridView dGV_innerObj;
+        private ComboBox comboBox1;
         private DataGridViewTextBoxColumn Index;
-        private DataGridViewTextBoxColumn Type;
+        private DataGridViewComboBoxColumn Type;
     }
 }

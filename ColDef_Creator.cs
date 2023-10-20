@@ -17,6 +17,8 @@ using static WinForms.ColDef_Creator;
 using System.Text;
 using System.Reflection.PortableExecutable;
 using Newtonsoft.Json.Linq;
+using ComboBox = System.Windows.Forms.ComboBox;
+using System.ComponentModel.DataAnnotations;
 
 namespace WinForms
 {
@@ -38,6 +40,8 @@ namespace WinForms
         private int tempColumnIndex = 0;
 
         private int tempRowIndex = 0;
+
+        ListViewItem lvi;
 
 
         public class innerObj
@@ -110,6 +114,7 @@ namespace WinForms
             this.Text = String.Format("ColDef Creator {0}", version);
 
         }
+
 
 
         private void InitialListView()
@@ -190,6 +195,9 @@ namespace WinForms
             //Assign the ImageList objects to the ListView.
             lstVwSubItems.LargeImageList = imageListLarge;
             lstVwSubItems.SmallImageList = imageListSmall;
+
+            this.comboBox1.Visible = false;
+
         }
 
         //設定右鍵選單
@@ -698,7 +706,8 @@ namespace WinForms
                     headerlist.ForEach(group =>
                     {
                         //textBoxResults.AppendText($"Score:{group.Key}, Count:{group.Count()}{Environment.NewLine}");
-                        this.dGdVwHeaders.Rows.Add(group.Key, "Grid/Form");
+                        //this.dGdVwHeaders.Rows.Add(group.Key, "Grid/Form");
+                        this.dGdVwHeaders.Rows.Add(group.Key, "");
                         //group.ToList().ForEach(item => textBoxResults.AppendText($"\tindex:{item.index}"));//, Score:{item.Score}  分組後內容取得
                     });
 
@@ -986,19 +995,23 @@ namespace WinForms
                 string _templateModel_form_header_end = "    ];\r\n\r\n//------------------------------------------------\r\n\r\n\r\n\r\n";
 
                 /*GRID部分*/
-                string _templateModel_grid_normal = "      {{\r\n        headerName: '{0}',\r\n        headerValueGetter: this._agService.headerValueGetter,\r\n        field: '{1}',\r\n        type: 'text',\r\n        editable: false,\r\n        width: 100,\r\n        suppressSizeToFit: true,\r\n      }},\r\n";
+                string _templateModel_grid_view_normal = "      {{\r\n        headerName: '{0}',\r\n        headerValueGetter: this._agService.headerValueGetter,\r\n        field: '{1}',\r\n        type: 'text',\r\n        editable: false,\r\n        width: 100,\r\n        suppressSizeToFit: true,\r\n      }},\r\n";
+                string _templateModel_grid_view_number = "      {{\r\n        headerName: '{0}',\r\n        headerValueGetter: this._agService.headerValueGetter,\r\n        field: '{1}',\r\n        type: 'number',\r\n        valueFormatter: this._pubFunction.formatNumber.bind(this, 2), //含 千份位＋顯示小數點後幾位\r\n        cellStyle: this._pubFunction.rightTextAlign,\r\n        floatingFilterComponent: 'numberFilterRenderer',\r\n        suppressSizeToFit: true,\r\n      }},\r\n";
+                string _templateModel_grid_view_date = "      {{\r\n        headerName: '{0}',\r\n        headerValueGetter: this._agService.headerValueGetter,\r\n        field: '{1}',\r\n        type: 'date',\r\n        editable: false,\r\n        width: 120,\r\n        suppressSizeToFit: true,\r\n        valueFormatter: this._pubFunction.formatDate,\r\n        // valueFormatter: (params) => {{\r\n        //   return this._pubFunction.formatDate({{ value: params.data?.{1} }}, 'yyyy/MM/dd');\r\n        // }},\r\n      }},\r\n";
                 string _templateModel_grid_confirm = "      {{\r\n        headerName: '{0}', //勾選\r\n        headerValueGetter: this._agService.headerValueGetter,\r\n        field: '{1}',\r\n        editable: false,\r\n        filter: false,\r\n        sortable: false,\r\n        cellRenderer: 'confirmRenderer',\r\n        width: 50,\r\n        suppressSizeToFit: true,\r\n        cellRendererParams: (params) => {{\r\n          // if (params.data?.ITEM === 0) return {{ disabled: true }};\r\n\r\n          return {{\r\n            checkValueType: EAgGridCheckValueType.booleanType,\r\n            // afterCheckedFunc: (value: boolean) => {{\r\n            //   if (value) {{\r\n            //     //判斷通過，勾選\r\n            //     params.data.{1} = true;\r\n            //   }} else {{\r\n            //     //取消勾選\r\n            //     params.data.{1} = false;\r\n            //   }}\r\n            //   params.node.setData(params.data);\r\n            // }},\r\n          }};\r\n        }},\r\n      }},\r\n";
+                string _templateModel_grid_check = "      {{\r\n        headerName: '{0}', \r\n        headerValueGetter: this._agService.headerValueGetter,\r\n        field: '{1}',\r\n        type: ['wrappingHeader'],\r\n        editable: false,\r\n        filter: false,\r\n        sortable: false,\r\n        cellRenderer: 'checkRenderer',\r\n        width: 50,\r\n        suppressSizeToFit: true,\r\n        valueGetter: (params) => {{\r\n          return params.data?.{1} === 'Y';\r\n        }},\r\n        valueSetter: (params) => {{\r\n          params.data.{1} = params.newValue ? 'Y' : null;\r\n          return true;\r\n        }},\r\n        cellRendererParams: (params) => {{\r\n          // if (params.data?.ITEM === 0) return {{ disabled: true }};\r\n          return {{\r\n            checkValueType: EAgGridCheckValueType.stringType,\r\n            onCheckedFunc: (value: string) => {{\r\n              // if (value == 'Y')\r\n              //   params.data.{1} = 'Y';  //勾選\r\n              // else\r\n              //   params.data.{1} = 'N';  //取消勾選\r\n              // params.node.setData(params.data);\r\n            }},\r\n          }};\r\n        }},\r\n      }},\r\n";
 
                 /*FORM部分*/
                 string _templateModel_form_normal = "      new FormTextBox({{\r\n        key: '{1}',\r\n        label: '{0}',\r\n        // labelWidth: 5,\r\n        flex: '20',\r\n        order: 1,\r\n        class: 'pr-1',\r\n        // readonly: true,\r\n      }}),\r\n";  // textAlign: 'right',\r\n
                 string _templateModel_form_btn = "      new FormButtonAuthority({{\r\n        showButtons: [\r\n          <IButtons>{{\r\n            key: 'confirm',\r\n            color: 'primary',\r\n            text: '{0}',\r\n            icon: 'done_all',\r\n            visible: true,\r\n            //visibledAsync: this.State.FormRefs.visibleAsync$,\r\n            clickFunction: () => {{\r\n              //this.Service.pushSave();\r\n            }},\r\n          }},\r\n        ],\r\n        flex: '20',\r\n        order: 1,\r\n        class: 'pr-1',\r\n      }}),\r\n";
+                string _templateModel_form_radio_btn = "      new FormRadioButton({{\r\n        key: '{0}',\r\n        label: '',\r\n        options: of([\r\n          // {{ key: 'A', value: '中文顯示A' }},\r\n          // {{ key: 'B', value: '中文顯示B' }},\r\n          // {{ key: 'C', value: '中文顯示C' }},\r\n        ]),\r\n        flex: '45',\r\n        // value: 'A',\r\n        inputChangeFunc: (params) => {{\r\n          // this._Service.query();\r\n        }},\r\n      }}),\r\n";
                 string _templateModel_form_hidden = "      new FormHidden({\r\n        key: '',\r\n        label: '',\r\n        order: 1,\r\n        flex: '20',\r\n      }),\r\n";
                 string _templateModel_form_hidden2 = "      new FormHidden({}),\r\n";
 
 
                 /*LOV部分*/
-                string _templateModel_grid_Lovl = "      {{\r\n        headerName: '{0}',\r\n        headerValueGetter: this._agService.headerValueGetter,\r\n        field: '{1}',\r\n        suppressSizeToFit: true,\r\n        editable: true, //(params) => {{ return params.data.ITEM === 0; // 可新增不可修改 }},\r\n        sortable: true,\r\n        width: 120,\r\n        type: 'text',\r\n        cellEditor: 'lovEditor',\r\n        cellEditorParams: (params) => {{\r\n          return <ILovEditorParams>{{\r\n            apiParams: {{\r\n              // sp前綴\r\n              moduleNo: '模組名稱',\r\n              programNo: '{2}',\r\n              commonApiType: ECommonApiType.CallStoreProcedureDataSet,\r\n            }},\r\n            queryAction: 'sp名稱', // sp名稱\r\n            //payload: {{}}, // input\r\n            refCursorKeys: ['v表名稱Info', 'v表名稱Count'], // output\r\n            colDefs: [\r\n{3}            ],\r\n            keyMapping: {{              {4}\r\n            }},\r\n            checkInput: true,\r\n            onPostChange: (params) => {{\r\n              if (params.isValidInput) //this._Service.ServiceFun(params.value);\r\n            }},\r\n          }};\r\n        }},\r\n      }},\r\n";
-                string _templateModel_form_Lovl = "      new FormLov({{\r\n        key: '{0}',\r\n        label: '{1}',\r\n        //labelWidth: '10',\r\n        apiParams: {{\r\n          moduleNo: '模組名稱',\r\n          programNo: '{2}',\r\n          commonApiType: ECommonApiType.CallStoreProcedureDataSet,\r\n        }},\r\n        queryAction: 'SP名稱', // sp名稱\r\n        refCursorKeys: ['v表名稱Info', 'v表名稱Count'],\r\n        colDefs: [\r\n{3}        ],\r\n        keyMapping: {{{4}\r\n        }},\r\n        checkInput: true,\r\n        flex: '25',\r\n        class: 'pr-1',\r\n      }}),\r\n";
+                string _templateModel_grid_Lovl = "      {{\r\n        headerName: '{0}',\r\n        headerValueGetter: this._agService.headerValueGetter,\r\n        field: '{1}',\r\n        suppressSizeToFit: true,\r\n        editable: true, //(params) => {{ return params.data.ITEM === 0; // 可新增不可修改 }},\r\n        sortable: true,\r\n        width: 120,\r\n        type: 'text',\r\n        cellEditor: 'lovEditor',\r\n        cellEditorParams: (params) => {{\r\n          return <ILovEditorParams>{{\r\n            apiParams: {{\r\n              // sp前綴\r\n              moduleNo: 模組名稱,\r\n              programNo: '{2}',\r\n              commonApiType: ECommonApiType.CallStoreProcedureDataSet,\r\n            }},\r\n            queryAction: sp名稱, // sp名稱\r\n            //payload: {{}}, // input\r\n            refCursorKeys: [v表名稱Info, v表名稱Count], // output\r\n            colDefs: [\r\n{3}            ],\r\n            keyMapping: {{              {4}\r\n            }},\r\n            checkInput: true,\r\n            onPostChange: (params) => {{\r\n              if (params.isValidInput) //this._Service.ServiceFun(params.value);\r\n            }},\r\n          }};\r\n        }},\r\n      }},\r\n";
+                string _templateModel_form_Lovl = "      new FormLov({{\r\n        key: '{0}',\r\n        label: '{1}',\r\n        //labelWidth: '10',\r\n        apiParams: {{\r\n          moduleNo: 模組名稱,\r\n          programNo: '{2}',\r\n          commonApiType: ECommonApiType.CallStoreProcedureDataSet,\r\n        }},\r\n        queryAction: SP名稱, // sp名稱\r\n        refCursorKeys: [v表名稱Info, v表名稱Count],\r\n        colDefs: [\r\n{3}        ],\r\n        keyMapping: {{{4}\r\n        }},\r\n        checkInput: true,\r\n        flex: '25',\r\n        class: 'pr-1',\r\n      }}),\r\n";
 
                 /*其他*/
                 string _templateModel_grid_select = "      {{\r\n        headerName: '{0}',\r\n        headerValueGetter: this._agService.headerValueGetter,\r\n        field: '{1}',\r\n        type: 'text',\r\n        editable: true, //(params) => {{return params.data?.ITEM === 0;}},// 可新增不可修改\r\n        sortable: true,\r\n        width: 100,\r\n        suppressSizeToFit: true,\r\n        valueFormatter: (params) => {{\r\n          const displayValue = params.node?.data?.{1} ?? '';\r\n          return {{ \r\n            // '1': 'Cosmos/KM3代工', '3': '組底加工' \r\n          }}[displayValue] ?? '';\r\n        }},\r\n        // valueSetter: (params) => {{\r\n        //   const optKey = params.newValue?.[0];\r\n        //   params.data.{1} = optKey;\r\n        //   return true;\r\n        // }},\r\n        cellEditor: 'selectRenderer',\r\n        cellEditorParams: {{\r\n          control: {{\r\n            multiple: false,\r\n            field: ['{1}'],\r\n            options: of([\r\n              // {{ key: '1', value: 'Cosmos/KM3代工' }},\r\n              // {{ key: '3', value: '組底加工' }},\r\n            ]),\r\n          }},\r\n        }},\r\n        floatingFilterComponent: 'selectFilterRenderer',\r\n        floatingFilterComponentParams: {{\r\n          options: of([\r\n            // {{ key: '1', value: 'Cosmos/KM3代工' }},\r\n            // {{ key: '3', value: '組底加工' }},\r\n          ]),\r\n        }},\r\n      }},\r\n";
@@ -1027,33 +1040,40 @@ namespace WinForms
                     //textBoxResults.AppendText(String.Format(_templateModel2, obj.itemChtName, obj.dbColumn));
                     if (_dataType == "Grid")
                     {
+                        string _templateModel = "";
                         if (obj.itemType == "文字項目" || obj.itemType == "顯示項目"
-                            || obj.itemType == "Text Item" || obj.itemType == "Dispaly Item")
-                            if (obj.itemChtName == null || obj.itemChtName == string.Empty)
-                            {
-                                string _templateModel_grid_noChtName = _templateModel_grid_normal.Replace("headerValueGetter: this._agService.headerValueGetter,", "//headerValueGetter: this._agService.headerValueGetter,");
-                                list_resultStr.Add(String.Format(_templateModel_grid_noChtName, obj.itemChtName, obj.dbColumn));
-                            }
-                            else
-                                list_resultStr.Add(String.Format(_templateModel_grid_normal, obj.itemChtName, obj.dbColumn));
+                            || obj.itemType == "Text Item" || obj.itemType == "Display Item")
+                        {
+                            _templateModel = Fun_Replace_GridView_String("View", obj, _templateModel_grid_view_number, _templateModel_grid_view_date, _templateModel_grid_view_normal);
+                            list_resultStr.Add(String.Format(_templateModel, obj.itemChtName, obj.dbColumn));
+                        }
+                        else if (obj.itemType == "控制項目")
+                        {
+                            _templateModel = Fun_Replace_GridView_String("noView", obj, _templateModel_grid_view_number, _templateModel_grid_view_date, _templateModel_grid_view_normal);
+                            list_resultStr.Add(String.Format(_templateModel, obj.itemChtName, obj.dbColumn));
+                        }
                         else if (obj.itemType == "核取方塊" || obj.itemType == "Check Box")
                             list_resultStr.Add(String.Format(_templateModel_grid_confirm, obj.itemChtName, obj.dbColumn));
+                        else if (obj.itemType == "值選擇框")
+                            list_resultStr.Add(String.Format(_templateModel_grid_check, obj.itemChtName, obj.dbColumn));
                         else if (obj.itemType.Contains("LOV_"))
                             list_resultStr.Add(String.Format(_templateModel_grid_Lovl, obj.itemChtName, obj.dbColumn, Path.GetFileNameWithoutExtension(filePath), Fun_Lov_Detail_String(obj.itemType, 0), Fun_Lov_Detail_String(obj.itemType, 1)));
                         else if (obj.itemType == "清單項目" || obj.itemType == "List Item")
                             list_resultStr.Add(String.Format(_templateModel_grid_select, obj.itemChtName, obj.dbColumn));
                         else
-                            list_resultStr.Add(String.Format(_templateModel_grid_normal, obj.itemChtName, obj.dbColumn));
+                            list_resultStr.Add(String.Format(_templateModel_grid_view_normal, obj.itemChtName, obj.dbColumn));
                     }
                     else if (_dataType == "Form")
                     {
                         if (obj.itemType == "文字項目" || obj.itemType == "顯示項目"
-                            || obj.itemType == "Text Item" || obj.itemType == "Dispaly Item")
+                            || obj.itemType == "Text Item" || obj.itemType == "Display Item")
                             list_resultStr.Add(String.Format(_templateModel_form_normal, obj.itemChtName, obj.dbColumn));
                         else if (obj.itemType == "按鈕" || obj.itemType == "Push Button")
                             list_resultStr.Add(String.Format(_templateModel_form_btn, obj.itemChtName));
                         else if (obj.itemType.Contains("LOV_"))
                             list_resultStr.Add(String.Format(_templateModel_form_Lovl, obj.itemChtName, obj.dbColumn, Path.GetFileNameWithoutExtension(filePath), Fun_Lov_Detail_String(obj.itemType, 0), Fun_Lov_Detail_String(obj.itemType, 1)));
+                        else if (obj.itemType == "圓鈕群組") //|| obj.itemType == ""
+                            list_resultStr.Add(String.Format(_templateModel_form_radio_btn, obj.itemEngName));
                         else if (obj.itemType == "Form隱藏格式")
                             list_resultStr.Add(_templateModel_form_hidden);
                         else
@@ -1083,6 +1103,41 @@ namespace WinForms
             System.Diagnostics.Process.Start("explorer.exe", "temp.txt");
 
         }
+
+
+        /// <summary>
+        /// GridView腳本替換細節部分
+        /// </summary>
+        /// <param name="datarow"></param>
+        public string Fun_Replace_GridView_String(string _type_flag, innerObj obj, string _view_number, string _view_date, string _view_normal)
+        {
+            string _templateModel = "";
+
+            obj.itemEngName = obj.itemEngName is not null ? obj.itemEngName : "";
+
+            if (obj.itemEngName.ToLower().Contains("qty") || obj.itemEngName.ToLower().Contains("price")
+                || obj.itemEngName.ToLower().Contains("gw") || obj.itemEngName.ToLower().Contains("gw"))
+            {
+                if (_type_flag == "View")
+                    _templateModel = _view_number;
+                else
+                    _templateModel = _view_number.Replace("      }},\r\n", "        cellEditor: 'textBoxRenderer',\r\n        cellEditorParams: () => ({{\r\n          control: {{\r\n            type: 'number',\r\n            max: '99999',\r\n            min: '0',\r\n            step: '1',\r\n            decimal: 0, //顯示小數點位數\r\n            allowEmpty: true,\r\n          }},\r\n        }}),\r\n      }},\r\n");
+            }
+            else if (obj.itemEngName.ToLower().Contains("date") || obj.itemEngName.ToLower().Contains("yymm"))
+                _templateModel = _view_date;
+            else
+                _templateModel = _view_normal;
+
+            if (obj.itemChtName == null || obj.itemChtName == string.Empty)
+            {
+                string _templateModel_grid_noChtName = _templateModel.Replace("headerValueGetter: this._agService.headerValueGetter,", "//headerValueGetter: this._agService.headerValueGetter,");
+                _templateModel = _templateModel_grid_noChtName;
+            }
+
+
+            return _templateModel;
+        }
+
 
         /// <summary>
         /// 載入細節部分
@@ -1263,6 +1318,80 @@ namespace WinForms
 
 
             txt.Close();
+        }
+
+        private void lstVwSubItems_MouseUp(object sender, MouseEventArgs e)
+        {
+            lvi = this.lstVwSubItems.GetItemAt(e.X, e.Y);
+            if (lvi != null)
+            {
+                string itemType = lvi.SubItems[5].Text;
+
+                if (itemType == "文字項目" || itemType == "顯示項目"
+                    || itemType == "Text Item" || itemType == "Display Item")
+                {
+                    this.comboBox1.Items.Clear();
+                    this.comboBox1.Visible = true;
+                    this.comboBox1.Items.Add("控制項目");
+                    this.comboBox1.Items.Add("顯示項目");
+                }
+                else if (itemType == "核取方塊" || itemType == "Check Box")
+                {
+                    this.comboBox1.Items.Clear();
+                    this.comboBox1.Visible = true;
+                    this.comboBox1.Items.Add("值選擇框");
+                    this.comboBox1.Items.Add("核取方塊");
+                }
+                else
+                {
+                    this.comboBox1.Visible = false;
+                    return;
+                }
+
+
+                //获取选中行的Bounds 
+                Rectangle Rect = lvi.Bounds;
+                int LX = lstVwSubItems.Columns[4].Width;
+                int RX = lstVwSubItems.Columns[4].Width + lstVwSubItems.Columns[5].Width;
+                // if (e.X > RX || e.X < LX)
+                //{
+                //this.comboBox1.Visible = false;
+                //Rect.X = lstVwSubItems.Left + lstVwSubItems.Columns[0].Width + 2;
+                Rect.Y = this.lstVwSubItems.Top + 2 + Rect.Y;
+                //Rect.Width = lstVwSubItems.Columns[1].Width + 2;
+
+
+                // Right side of cell is in view.
+                Rect.Width = lstVwSubItems.Columns[5].Width + Rect.Left;
+                Rect.X = lstVwSubItems.Left +
+                    lstVwSubItems.Columns[0].Width +
+                    lstVwSubItems.Columns[1].Width +
+                    lstVwSubItems.Columns[2].Width +
+                    lstVwSubItems.Columns[3].Width +
+                    lstVwSubItems.Columns[4].Width + 2;
+
+                this.comboBox1.Bounds = Rect;
+                this.comboBox1.Text = lvi.SubItems[5].Text;
+                this.comboBox1.Visible = true;
+                this.comboBox1.BringToFront();
+                this.comboBox1.Focus();
+                //}
+                // int intColIndex = lvi.SubItems.IndexOf(lvi.GetSubItemAt(e.X, e.Y));
+            }
+        }
+
+        private void comboBox1_SelectedValueChanged(object sender, EventArgs e)
+        {
+            // Set text of ListView item to match the ComboBox.
+            lvi.SubItems[5].Text = comboBox1.Text;
+            this.comboBox1.Visible = false;
+        }
+
+        private void comboBox1_MouseLeave(object sender, EventArgs e)
+        {
+            // Set text of ListView item to match the ComboBox.
+            lvi.SubItems[5].Text = comboBox1.Text;
+            this.comboBox1.Visible = false;
         }
     }
 }
